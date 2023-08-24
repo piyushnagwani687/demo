@@ -6,15 +6,22 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <html>
+    <head>
+        <title>Employees</title>
+    </head>
     <body class="mt-5 p-5" >
-        <a class="btn btn-primary mb-4" href="{{route('employees.create')}}">Add Employee</a>
+        @if (Auth::user()->role != 'employee')
+            <a class="btn btn-primary mb-4" href="{{route('employees.create')}}">Add Employee</a>
+        @endif
         <table id="myapp" class="table table-striped table-bordered" style="width:100%">
             <thead>
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone Number</th>
-                    <th>Status</th>
+                    @if (Auth::user()->role != 'employee')
+                        <th>Status</th>
+                    @endif
                     <th>Action</th>
                 </tr>
             </thead>
@@ -23,14 +30,16 @@
                     <tr>
                         <td>{{$user->name}}</td>
                         <td>{{$user->email}}</td>
-                        <td>{{$user->phone_number}}</td>
-                        <td>
-                            <select class="form-select w-50 change-status" data-user-id="{{$user->id}}" aria-label="Default select example">
-                                <option>select status</option>
-                                <option value="active" {{$user->status == 'active' ? 'selected' : ''}}>Active</option>
-                                <option value="inactive" {{$user->status == 'inactive' ? 'selected' : ''}}>Inactive</option>
-                              </select>
-                        </td>
+                        <td>{{isset($user->employee) ? $user->employee->phone_number : '' }}</td>
+                        @if (Auth::user()->role != 'employee')
+                            <td>
+                                <select class="form-select w-50 change-status" data-user-id="{{$user->id}}" aria-label="Default select example">
+                                    <option>select status</option>
+                                    <option value="active" {{$user->status == 'active' ? 'selected' : ''}}>Active</option>
+                                    <option value="inactive" {{$user->status == 'inactive' ? 'selected' : ''}}>Inactive</option>
+                                </select>
+                            </td>
+                        @endif
                         <td>
                             <div class="dropdown">
                                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,8 +47,9 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                   <li><a class="dropdown-item" href="{{route('employees.edit', $user->id)}}">Edit</a></li>
-                                  <li><a class="dropdown-item delete-row" data-id="{{$user->id}}">Delete</a></li>
-                                  {{-- <li><a class="dropdown-item" href="{{route('employees.vi')}}">View</a></li> --}}
+                                  @if (Auth::user()->role != 'employee')
+                                    <li><a class="dropdown-item delete-row" data-id="{{$user->id}}">Delete</a></li>
+                                  @endif
                                 </ul>
                             </div>
                         </td>
@@ -87,7 +97,7 @@
                 status:status,
             },
             success:function($response){
-
+                window.location.reload();
             }
         })
 

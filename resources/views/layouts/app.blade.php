@@ -20,15 +20,29 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                {{-- <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'White Legals') }}
-                </a> --}}
-                <a class="navbar-brand" href="{{ route('employees.index') }}">
-                    {{ 'Employees' }}
+
+                <a class="navbar-brand" style="margin-left: -50px;" href="{{ url('/home') }}">
+                    {{ 'White Legals' }}
                 </a>
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ 'Clients' }}
-                </a>
+
+                @if (Auth::check())
+                    <div class="collapse navbar-collapse" style="margin-left:70px;" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            @if (Auth::user()->role != 'client')
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('employees.index') }}">
+                                        {{ 'Employees' }}
+                                    </a>
+                                </li>
+                            @endif
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('clients.index') }}">
+                                    {{ 'Clients' }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                @endif
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>

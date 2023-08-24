@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\employees\StoreRequest;
+use App\Http\Requests\employees\UpdateRequest;
 
 class EmployeeController extends Controller
 {
@@ -13,6 +16,7 @@ class EmployeeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+
     }
 
     /**
@@ -21,8 +25,21 @@ class EmployeeController extends Controller
 
     public function index()
     {
-        $user = User::with(['employee'])->get();
-        // dd($user);
+        $auth = Auth::user();
+
+        if($auth->role == 'client')
+        {
+            abort(403);
+        }
+
+        if($auth->role == 'employee')
+        {
+            $user  = User::with('employee')->where('id', $auth->id)->get();
+        }
+        elseif($auth->role == 'admin'){
+            $user = User::with('employee')->where('role', 'employee')->get();
+        }
+
         return view('employees.index', ['users' => $user]);
     }
 
@@ -31,13 +48,20 @@ class EmployeeController extends Controller
      */
     public function create()
     {
+        $auth = Auth::user();
+
+        if($auth->role == 'client')
+        {
+            abort(403);
+        }
+
         return view('employees.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
         $user = new User();
         $user->name = $request->name;
@@ -51,15 +75,7 @@ class EmployeeController extends Controller
         $employee->user_id = $user->id;
         $employee->save();
 
-        return ['redirectUrl' => route('employees.index')];
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return response()->json(['redirectUrl' => route('employees.index')]);
     }
 
     /**
@@ -67,6 +83,13 @@ class EmployeeController extends Controller
      */
     public function edit(string $id)
     {
+        $auth = Auth::user();
+
+        if($auth->role == 'client')
+        {
+            abort(403);
+        }
+
         $user = User::findOrFail($id);
         return view('employees.edit', ['user' => $user]);
     }
@@ -74,20 +97,19 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRequest $request, string $id)
     {
         $user = User::findOrFail($id);
         $user->name = $request->name;
         $user->email = $request->email;
 
         if ($request->password != '') {
-            $user->password = bcrypt($request->password);
+            $user->password = Hash::make($request->password);
         }
 
         $user->save();
 
         $employee = Employee::where('user_id', $user->id)->first();
-        // dd($employee);
         $employee->phone_number = $request->phone_number;
         $employee->save();
 

@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    
+
     public function up(): void
     {
         Schema::create('employees', function (Blueprint $table) {
@@ -27,6 +27,7 @@ return new class extends Migration
             $table->foreign('user_id')->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->string('city')->nullable();
             $table->text('notes')->nullable();
+            $table->text('address')->nullable();
             $table->timestamps();
         });
     }

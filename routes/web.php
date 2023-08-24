@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\EmployeeController;
 
 /*
@@ -25,3 +26,5 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('users', [UserController::class, 'index']);
 Route::resource('employees', EmployeeController::class);
 Route::post('employees/change-status', [EmployeeController::class, 'changeStatus'])->name('employees.change-status');
+Route::resource('clients', ClientController::class);
+Route::post('clients/change-status', [ClientController::class, 'changeStatus'])->name('clients.change-status');

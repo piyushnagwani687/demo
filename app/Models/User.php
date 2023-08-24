@@ -25,7 +25,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role'
     ];
+
+    public $timestamps = false;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -49,7 +52,12 @@ class User extends Authenticatable
 
     public function employee() : HasOne
     {
-        return $this->hasOne(Employee::class);
+        return $this->hasOne(Employee::class, 'user_id');
+    }
+
+    public function client() : HasOne
+    {
+        return $this->hasOne(Client::class, 'user_id');
     }
 
 }

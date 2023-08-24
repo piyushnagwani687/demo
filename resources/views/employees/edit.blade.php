@@ -1,18 +1,22 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
+<title>Edit Employee</title>
 <div class="container mt-5 w-25">
+    <h3>Edit Employee</h3>
     <form method="POST" id="employee-form">
         @method('Put')
         @csrf
         <div class="mb-3">
             <label class="form-label">Name</label>
             <input value="{{$user->name}}" type="text" class="form-control" name="name">
+            <div class="text-danger name-error-msg">
+            </div>
         </div>
         <div class="mb-3">
             <label class="form-label">Email address</label>
             <input type="email" value="{{$user->email}}" class="form-control" name="email">
-            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            <div class="text-danger email-error-msg">
+            </div>
         </div>
         <div class="mb-3">
             <label class="form-label">Phone No</label>
@@ -41,6 +45,12 @@
             data:data,
             success:function(response){
                 window.location.href = response.redirectUrl
+            },
+            error: function(response){
+                var name = response.responseJSON.errors.name[0];
+                $('#employee-form').find(".name-error-msg").html(name);
+                var email = response.responseJSON.errors.email[0];
+                $('#employee-form').find(".email-error-msg").html(email);
             }
         })
     });
